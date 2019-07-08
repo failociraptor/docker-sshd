@@ -11,6 +11,7 @@ Optionally mount a custom sshd config at `/etc/ssh/`.
 ## Environment Options
 
 - `SSH_USERS` list of user accounts and uids/gids to create. eg `SSH_USERS=www:48:48,admin:1000:1000`
+- `HOST_FOWARD` automatically ssh's to a different host after logging in (doesn't work with `SFTP_MODE`)
 - `SSH_ENABLE_ROOT` if "true" unlock the root account
 - `MOTD` change the login message
 - `SFTP_MODE` if "true" sshd will only accept sftp connections
