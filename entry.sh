@@ -62,6 +62,13 @@ if [ -w /etc/authorized_keys ]; then
     find /etc/authorized_keys/ -type f -exec chmod 644 {} \;
 fi
 
+if [ -n "${HOST_FORWARD}" ]; then
+    echo ">> Adding host forwarding to ${HOST_FORWARD}."
+    printf '%s\n' \
+        "set /files/etc/ssh/sshd_config/ForceCommand 'ssh -t ${HOST_FORWARD}'" \
+    | augtool -s
+fi
+
 # Add users if SSH_USERS=user:uid:gid set
 if [ -n "${SSH_USERS}" ]; then
     USERS=$(echo $SSH_USERS | tr "," "\n")
@@ -70,11 +77,12 @@ if [ -n "${SSH_USERS}" ]; then
         _NAME=${UA[0]}
         _UID=${UA[1]}
         _GID=${UA[2]}
-
+        
         echo ">> Adding user ${_NAME} with uid: ${_UID}, gid: ${_GID}."
         if [ ! -e "/etc/authorized_keys/${_NAME}" ]; then
             echo "WARNING: No SSH authorized_keys found for ${_NAME}!"
         fi
+        
         getent group ${_NAME} >/dev/null 2>&1 || groupadd -g ${_GID} ${_NAME}
         getent passwd ${_NAME} >/dev/null 2>&1 || useradd -r -m -p '' -u ${_UID} -g ${_GID} -s '' -c 'SSHD User' ${_NAME}
     done
